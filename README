@@ -11,3 +11,5 @@ Step 2 pms_dx: Generating a probable PMS diagnosis.
 Calculate the total (net) score for days -5 to -1 vs. +5 to +10. Let's call these periods LP (luteal period) vs. FP (follicular period).
 If LP is greater than or equal to 50% than FP, the person has PMS. This pattern has to be present on at least 2 cycles (cycles 2 and 3). 
 Additionally, any of the DRSP Items 22 through 24 have to be 3 or above in LP. 
+
+Also included are a ridgeplot and lineplot to provide descriptive figures. 
