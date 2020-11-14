@@ -22,15 +22,15 @@ oldN=c("redcap_event_name","redcap_repeat_instrument","redcap_repeat_instance","
 newN=c("cycle_number","instrument","mens_day","mens_date")
 setnames(pms,oldN,newN) #rename some columns for ease
 
-pms=pms%>%filter(id>=1500000 & id<=1600000) #numerical IDs only (exclude DNQ)
+pms=pms%>%filter(id>=1500000 & id<=1600000) #numerical IDs only (exclude participants who didn't qualify)
 
-pms$cycle_number=gsub("cycle_1_arm_1","1",pms$cycle_number)
+pms$cycle_number=gsub("cycle_1_arm_1","1",pms$cycle_number) #rename cycle numbers
 pms$cycle_number=gsub("cycle_2_arm_1","2",pms$cycle_number)
 pms$cycle_number=gsub("cycle_3_arm_1","3",pms$cycle_number)
 pms$cycle_number=gsub("cycle_4_arm_1","4",pms$cycle_number)
 
-
-pms$mens_date=as.Date(pms$mens_date,"%m/%d/%y")
+#Date formatting
+pms$mens_date=as.Date(pms$mens_date,"%m/%d/%y") 
 pms$premom_screenshot_timestamp=as.Date(pms$premom_screenshot_timestamp,"%m/%d/%y")
 pms$actual_d1=as.Date(pms$actual_d1,"%m/%d/%y")
 pms$lh_peak=as.Date(pms$lh_peak,"%m/%d/%y")
@@ -44,10 +44,10 @@ for(subject in unique(pms$id)){ #for every unique subject number
   s=pms[pms$id==subject,]
   dates=s[!is.na(s$actual_d1),c("cycle_number","actual_d1","lh_peak")] #anchor dates
   
-  for(cycle in unique(pms[pms$id==subject & pms$instrument=="drsp_v2",]$cycle_number)){
-    day1=as.Date(dates[dates$cycle_number==cycle,c("actual_d1")])
-    day1rep=rep(day1,nrow(s[s$cycle_number==cycle & s$instrument=="drsp_v2",]))
-    d=s[s$cycle_number==cycle & s$instrument=="drsp_v2",]$mens_day-1+day1rep
+  for(cycle in unique(pms[pms$id==subject & pms$instrument=="drsp_v2",]$cycle_number)){ #within DRSP for each cycle for each subject
+    day1=as.Date(dates[dates$cycle_number==cycle,c("actual_d1")]) #set first day of cycle as "actual_d1"
+    day1rep=rep(day1,nrow(s[s$cycle_number==cycle & s$instrument=="drsp_v2",])) 
+    d=s[s$cycle_number==cycle & s$instrument=="drsp_v2",]$mens_day-1+day1rep #correct dates (some participants submitted DRSP one day late)
     s[s$cycle_number==cycle & s$instrument=="drsp_v2",c("mens_date")]=factor(d)
     
     pms[pms$id==subject & pms$cycle_number==cycle & pms$instrument=="drsp_v2",]=s[s$cycle_number==cycle & s$instrument=="drsp_v2",]
