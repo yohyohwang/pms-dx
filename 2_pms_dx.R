@@ -52,30 +52,31 @@ for(subject in unique(pms$id)){ #for every unique subject number
        "drsp_v2" %in% pms[pms$id==subject & pms$cycle_number==3 & pms$instrument=="drsp_v2",]$instrument){ #if there are 4 cycles in this record and DRSP is recorded for cycles 2-3
     
       drsp_g3=0
-      s=pms[pms$id==subject,]
+      s=pms[pms$id==subject,] #use "s" as a duplicate structure
     
       dates=s[!is.na(s$actual_d1),c("cycle_number","actual_d1","lh_peak")] #anchor dates
       
       if(4 %in% dates$cycle_number){#if d1 for 4th cycle was reported
       
+      #initialize some variables
       dx=0
       lh_peak_detected=c(0,0)
       lsum_total=c(0,0)
       fsum_total=c(0,0)
       
-      for(cycle in c(2,3)){
+      for(cycle in c(2,3)){ #look at cycles 2 and 3
         
-        day1=as.Date(dates[dates$cycle_number==cycle,c("actual_d1")])
-        lhpeak=as.Date(dates[dates$cycle_number==cycle,c("lh_peak")])
+        day1=as.Date(dates[dates$cycle_number==cycle,c("actual_d1")]) #set day1 date
+        lhpeak=as.Date(dates[dates$cycle_number==cycle,c("lh_peak")]) #set LH peak date
         
         lrange_dates=c((day1)+lrange[1],(day1)+lrange[2]) #date range for luteal phase
         frange_dates=c((day1)+frange[1],(day1)+frange[2]) #date range for follicular phase
         
-        lsum=sum(s[as.Date(s$mens_date)>=lrange_dates[1]
+        lsum=sum(s[as.Date(s$mens_date)>=lrange_dates[1] #sum of DRSP responses for luteal phase
                    & as.Date(s$mens_date)<=lrange_dates[2],]$drsp_sum,
                  na.rm=TRUE)
 
-        fsum=sum(s[as.Date(s$mens_date)>=frange_dates[1]
+        fsum=sum(s[as.Date(s$mens_date)>=frange_dates[1] #sum of DRSP responses for follicular phase
                    & as.Date(s$mens_date)<=frange_dates[2],]$drsp_sum,
                  na.rm=TRUE)
         
@@ -83,8 +84,8 @@ for(subject in unique(pms$id)){ #for every unique subject number
         #fsum=sum(s[s$mens_date>=frange_dates[1] & s$mens_date<=frange_dates[2],c("drsp_sum")],na.rm=TRUE)
         
         
-        if(lsum>=fsum/2){
-          dx=dx+1
+        if(lsum>=fsum/2){ #is the sum of DRSP responses for the luteal phase ≥ sum of follicular phase?
+          dx=dx+1 #add 1 to dx variable
         }
         
         lsum_total[cycle-1]=lsum
